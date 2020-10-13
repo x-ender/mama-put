@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const Customer = Schema({
-    Username: {
+    username: {
         type: String,
         required: true,
         unique: true,
@@ -16,10 +16,6 @@ const Customer = Schema({
         type: String,
         required: true,
     },
-    paymentId: {
-        type: String,
-        required: true,
-    }
 });
 
 module.exports = mongoose.model("Customer", Customer);

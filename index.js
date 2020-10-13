@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const customerRoute = require("./routes/api/customer");
 
 // Init express
 const app = express();
@@ -20,7 +21,9 @@ connection.once('open', () => {
 })
 
 
-
+//Middleware
+app.use(express.json());
+app.use('/customer', customerRoute);
 
 // Homepage Route
 app.get('/', (req, res) => {
