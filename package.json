@@ -1,0 +1,19 @@
+{
+  "name": "mama_put",
+  "version": "1.0.0",
+  "description": "An eatery node.js application for food order with express server and mongo db",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/x-ender/mama-put.git"
+  },
+  "author": "Nkwo Chimdike",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/x-ender/mama-put/issues"
+  },
+  "homepage": "https://github.com/x-ender/mama-put#readme"
+}
