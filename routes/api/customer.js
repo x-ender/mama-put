@@ -61,9 +61,9 @@ router.route("/register").post((req, res) => {
 
 // Update Phone number
 router.route("/update/:username").patch((req, res) => {
-    Customer.findOneAndUpdate(
+    Customer.updateOne(
         {username: req.params.username},
-        {$set: {phone: req.params.phone}},
+        {$set: {phone: req.body.phone}},
         (err, result) => {
             if(err) return res.status(500).json({msg: err});
             const msg = {
