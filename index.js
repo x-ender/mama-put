@@ -1,21 +1,14 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const connection = require('./database');
 const customerRoute = require("./routes/api/customer");
+const menuRoute = require("./routes/api/menu");
 
 // Init express
 const app = express();
 // PORT
 const PORT = process.env.PORT || 5000;
 
-// Init Mongoose for mongoDB
-mongoose.connect('mongodb://localhost:27017/mamaput', {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-});
-
 // Establishing Connection
-const connection = mongoose.connection;
 connection.once('open', () => {
     console.log("Mongodb connected");
 })
@@ -23,7 +16,8 @@ connection.once('open', () => {
 
 //Middleware
 app.use(express.json());
-app.use('/customer', customerRoute);
+app.use('/api/customer', customerRoute);
+app.use('/api/menu', menuRoute);
 
 // Homepage Route
 app.get('/', (req, res) => {
