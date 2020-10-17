@@ -4,22 +4,75 @@ const Customer = require("../../models/customer.model");
 const config = require("../../config");
 const jwt = require("jsonwebtoken");
 const middleware = require("../../middleware");
-const e = require('express');
 
 const router = express.Router();
+
+// Get all Menu Items
+router.route("/").get((req, res) => {
+    var select = req.query.select;
+    Menu.find({}, (err, menu) => {
+        if(err){
+            console.log(err);
+            return res.status(500).json({msg: err});
+        } else{
+            if(menu.length == 0){
+                var resposeObject = undefined;
+                if(select && select == 'count'){
+                    resposeObject = {count: 0};
+                }
+                return res.status(404).json({msg: "No Menu Item found", resposeObject});
+            } else {
+                var responseObject = menu;
+                if(select && select == 'count'){
+                    responseObject = {count: menu.length};
+                }
+                return res.status(200).json({msg: "Menu Found", menu});
+            }
+        }
+    });
+});
+
+
+// Get all Available Menu Items
+router.route("/available").get((req, res) => {
+    var select = req.query.select;
+    Menu.find({available: true}, (err, menu) => {
+        if(err){
+            console.log(err);
+            return res.status(500).json({msg: err});
+        } else{
+            if(menu.length == 0){
+                var resposeObject = undefined;
+                if(select && select == 'count'){
+                    resposeObject = {count: 0};
+                }
+                return res.status(404).json({msg: "No Menu Item found", resposeObject});
+            } else {
+                var responseObject = menu;
+                if(select && select == 'count'){
+                    responseObject = {count: menu.length};
+                }
+                return res.status(200).json({msg: "Menu Found", menu});
+            }
+        }
+    });
+});
 
 // Find by id
 router.route("/id/:id").get((req, res) => {
     var id = req.params.id;
-    Menu.findOne({_id: id}, (err, foundObject) => {
+    Menu.findOne({_id: id}, (err, menu_item) => {
         if(err){
             console.log(err);
-            res.status(500).json({msg: err});
+            return res.status(500).json({msg: err});
         } else{
-            if(!foundObject){
-                res.status(404).json({msg: "Menu id not found"});
+            if(menu_item === null){
+                return res.status(404).json({msg: "Menu Item not found"});
             } else {
-                res.send(foundObject);
+                return res.status(200).json({
+                    msg: "Menu Item found",
+                    menu_item
+                });
             }
         }
     });
@@ -28,15 +81,18 @@ router.route("/id/:id").get((req, res) => {
 // Find by category
 router.route("/category/:category").get((req, res) => {
     var category = req.params.category;
-    Menu.find({category: category}, (err, foundObject) => {
+    Menu.find({category: category}, (err, menu_item) => {
         if(err){
             console.log(err);
-            res.status(500).json({msg: err});
+            return res.status(500).json({msg: err});
         } else{
-            if(!foundObject){
-                res.status(404).json({msg: "Menu category not found"});
+            if(menu_item === null){
+                return res.status(404).json({msg: "Menu Item with that category not found"});
             } else {
-                res.send(foundObject);
+                return res.status(200).json({
+                    msg: "Menu item found",
+                    menu_item
+                })
             }
         }
     });
@@ -57,36 +113,40 @@ router.route("/add").post((req, res) => {
     .save()
     .then(() => {
         console.log('New Menu Item Added');
-        res.status(200).json({
+        return res.status(200).json({
             msg: 'New Menu Item Added',
             name: req.body.name,
             category: req.body.category
         });
     })
     .catch((err) => {
-        res.status(403).json({msg: err});
+        return res.status(403).json({msg: err});
     });
 });
 
 // Set menu-item as available
 router.route("/update/available/:id").put((req, res) => {
     var id = req.params.id;
-    Menu.findOne({_id: id}, (err, foundObject) => {
+    Menu.findOne({_id: id}, (err, menu_item) => {
         if(err){
             console.log(err);
-            res.status(500).json({msg: err});
+            return res.status(500).json({msg: err});
         } else{
-            if(!foundObject){
-                res.status(404).json({msg: "Id not found"});
+            if(menu_item === null){
+                return res.status(404).json({msg: "Id not found"});
             } else {
-                foundObject.available = true;
+                menu_item.available = true;
 
-                foundObject.save((err, updatedObject) => {
+                menu_item.save((err, updatedMenuItem) => {
                     if(err){
                         console.log(err);
-                        res.status(500).json({msg: err});
+                        return res.status(500).json({msg: err});
                     } else {
-                        res.send(updatedObject);
+                        let resp = {
+                            msg: `${updatedMenuItem.name} is now available`,
+                            update: updatedMenuItem
+                        }
+                        return res.status(200).json(resp);
                     }
                 });
             }
@@ -97,22 +157,26 @@ router.route("/update/available/:id").put((req, res) => {
 // Set menu-item as unavailable
 router.route("/update/unavailable/:id").put((req, res) => {
     var id = req.params.id;
-    Menu.findOne({_id: id}, (err, foundObject) => {
+    Menu.findOne({_id: id}, (err, menu_item) => {
         if(err){
             console.log(err);
-            res.status(500).json({msg: err});
+            return res.status(500).json({msg: err});
         } else{
-            if(!foundObject){
-                res.status(404).json({msg: "Id not found"});
+            if(menu_item === null){
+                return res.status(404).json({msg: "Id not found"});
             } else {
-                foundObject.available = false;
+                menu_item.available = false;
 
-                foundObject.save((err, updatedObject) => {
+                menu_item.save((err, updatedMenuItem) => {
                     if(err){
                         console.log(err);
-                        res.status(500).json({msg: err});
+                        return res.status(500).json({msg: err});
                     } else {
-                        res.send(updatedObject);
+                        let resp = {
+                            msg: `${updatedMenuItem.name} is now unavailable`,
+                            update: updatedMenuItem
+                        }
+                        return res.status(200).json(resp);
                     }
                 });
             }
@@ -123,41 +187,41 @@ router.route("/update/unavailable/:id").put((req, res) => {
 // Update menu-item Info
 router.route("/update/:id").put((req, res) => {
     var id = req.params.id;
-    Menu.findOne({_id: id}, (err, foundObject) => {
+    Menu.findOne({_id: id}, (err, menu_item) => {
         if(err){
             console.log(err);
-            res.status(500).json({msg: err});
+            return res.status(500).json({msg: err});
         } else{
-            if(!foundObject){
-                res.status(404).json({msg: "Id not found"});
+            if(menu_item === null){
+                return res.status(404).json({msg: "Id not found"});
             } else {
                 //If you are updating from body
                 if(req.body.name){
-                    foundObject.name = req.body.name;
+                    menu_item.name = req.body.name;
                 }
                 if(req.body.category){
-                    foundObject.category = req.body.category;
+                    menu_item.category = req.body.category;
                 }
                 if(req.body.price){
-                    foundObject.price = req.body.price;
+                    menu_item.price = req.body.price;
                 }
                 if(req.body.currency){
-                    foundObject.currency = req.body.currency;
+                    menu_item.currency = req.body.currency;
                 }
                 if(req.body.photo){
-                    foundObject.photo = req.body.photo;
+                    menu_item.photo = req.body.photo;
                 }
 
-                foundObject.save((err, updatedObject) => {
+                menu_item.save((err, updatedMenuItem) => {
                     if(err){
                         console.log(err);
-                        res.status(500).json({msg: err});
+                        return res.status(500).json({msg: err});
                     } else {
                         var resp = {
                             msg: "Info Updated Successfully",
-                            update: updatedObject
+                            update: updatedMenuItem
                         }
-                        res.json(resp);
+                        return res.status(200).json(resp);
                     }
                 });
             }
@@ -165,20 +229,22 @@ router.route("/update/:id").put((req, res) => {
     });
 });
 
-// Remove Customer
+// Remove Menu Item
 router.route("/remove/:id").delete((req, res) => {
-    Menu.findOneAndDelete(
-        {_id: req.params.id},
+    let id = req.params.id;
+    Menu.findOneAndDelete({_id: id},
         (err, result) => {
-            if(err) return res.status(500).json({
-                msg: "Id does not exist",
-                err: err
-            });
-            const msg = {
-                msg: "MenuItem Removed",
-                id: req.params.id,
-            };
-            return res.json(msg);
+            if(err) return res.status(500).json({err: err});
+            else{
+                if(result === null){
+                    return res.status(400).json({msg: "Menu Item is not found"})
+                }
+                const msg = {
+                    msg: "MenuItem Removed",
+                    id: req.params.id,
+                };
+                return res.status(200).json(msg);
+            }
         }
     );
 })

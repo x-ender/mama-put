@@ -3,20 +3,28 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const Order = Schema({
-    orderItemNames: {
-        type: Array,
+    itemName: {
+        type: String,
+        required: true,
+    },
+    itemId: {
+        type: String,
         required: true,
     },
     quantity: {
-        type: String,
+        type: Number,
         required: true,
     },
     customerId: {
         type: String,
         required: true,
     },
-    totalPrice: {
+    price: {
         type: String,
+        required: true,
+    },
+    ready: {
+        type: Boolean,
         required: true,
     },
     pickupTime: {

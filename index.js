@@ -2,6 +2,7 @@ const express = require('express');
 const connection = require('./database');
 const customerRoute = require("./routes/api/customer");
 const menuRoute = require("./routes/api/menu");
+const orderRoute = require("./routes/api/order");
 
 // Init express
 const app = express();
@@ -18,6 +19,7 @@ connection.once('open', () => {
 app.use(express.json());
 app.use('/api/customer', customerRoute);
 app.use('/api/menu', menuRoute);
+app.use('/api/order', orderRoute);
 
 // Homepage Route
 app.get('/', (req, res) => {
