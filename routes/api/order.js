@@ -124,21 +124,24 @@ router.route(`/add/:customerId/:menuItemId`).post((req, res) => {
 
 // Remove an order
 router.route("/remove/:id").delete((req, res) => {
-    let id = res.params.id;
-    Order.findOneAndDelete({_id: id}, (err, result) => {
-            if(err) return res.status(500).json({err: err});
+    let id = req.params.id;
+    Order.findOneAndDelete(
+        {_id: id},
+        (err, result) => {
+            if(err) return res.status(500).json({msg: err});
             else{
                 if(result === null){
-                    return res.status(400).json({msg: "Order not found"});
+                    return res.status(400).json({msg: "Order not found"})
                 }
                 const msg = {
                     msg: "Order Removed",
-                    id: req.params.id,
+                    id: id,
                 };
-                return res.json(msg);
+                return res.status(200).json(msg);
             }
         }
     );
-})
+    
+});
 
 module.exports = router;

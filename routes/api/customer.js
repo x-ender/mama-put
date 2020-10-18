@@ -1,9 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const Customer = require("../../models/customer.model");
-const config = require("../../config");
-const jwt = require("jsonwebtoken");
-const middleware = require("../../middleware");
 
 const router = express.Router();
 
